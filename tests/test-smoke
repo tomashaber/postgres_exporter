@@ -24,6 +24,7 @@ smoketest_postgres() {
         echo "Waiting for postgres to start..."
         if [ $(( $(date +%s) - $WAIT_START )) -gt $TIMEOUT ]; then
             echo "Timed out waiting for postgres!" 1>&2
+            docker logs $CONTAINER_NAME
             docker kill $CONTAINER_NAME
             docker rm $CONTAINER_NAME
             exit 1
@@ -37,6 +38,7 @@ smoketest_postgres() {
     if [ "$?" != "0" ]; then
         echo "Failed on postgres $version ($DOCKER_IMAGE)" 1>&2
         kill $exporter_pid
+        docker logs $CONTAINER_NAME
         docker kill $CONTAINER_NAME
         docker rm $CONTAINER_NAME
         exit 1
