@@ -17,7 +17,7 @@ smoketest_postgres() {
     
     local CUR_IMAGE=$IMAGE_NAME:$version
     
-    docker run -d --name=$CONTAINER_NAME -e POSTGRES_PASSWORD=password --net=host $CUR_IMAGE
+    docker run -d --name=$CONTAINER_NAME -e POSTGRES_PASSWORD=password -p 127.0.0.1:55432:5432 $CUR_IMAGE
 
     local WAIT_START=$(date +%s)
     while ! docker exec $CONTAINER_NAME bash -c "psql -U postgres -c \"select 'running'\" > /dev/null 2>&1 " ; do
@@ -32,7 +32,7 @@ smoketest_postgres() {
         sleep 1
     done
 
-    DATA_SOURCE_NAME="postgresql://postgres:password@localhost:5432/?sslmode=disable" ./postgres_exporter &
+    DATA_SOURCE_NAME="postgresql://postgres:password@localhost:55432/?sslmode=disable" ./postgres_exporter &
     exporter_pid=$!
     wget -q -O - http://localhost:9113/metrics 1> /dev/null
     if [ "$?" != "0" ]; then
