@@ -27,6 +27,10 @@ var (
 		"web.telemetry-path", "/metrics",
 		"Path under which to expose metrics.",
 	)
+	queriesPath = flag.String(
+		"extend.query-path", "",
+		"Path to custom queries to run.",
+	)
 )
 
 // Metric name parts.
