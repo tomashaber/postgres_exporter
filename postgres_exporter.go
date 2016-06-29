@@ -219,7 +219,7 @@ var queryOverrides = map[string]string{
 }
 
 // Add queries to the metricMaps and queryOverrides maps
-func add_queries(queriesPath string) (err error) {
+func addQueries(queriesPath string) (err error) {
 	var extra map[string]interface{}
 
 	content, err := ioutil.ReadFile(queriesPath)
@@ -255,7 +255,7 @@ func add_queries(queriesPath string) (err error) {
 						for attr_key, attr_val := range a.(map[interface{}]interface{}) {
 							switch(attr_key.(string)) {
 							case "usage":
-								usage, err := _string_to_columnusage(attr_val.(string))
+								usage, err := stringToColumnUsage(attr_val.(string))
 								if err != nil {
 									return err
 								}
@@ -278,34 +278,6 @@ func add_queries(queriesPath string) (err error) {
 
 	return
 }
-
-// convert a string to the corresponding ColumnUsage
-func _string_to_columnusage(s string) (u ColumnUsage, err error) {
-	switch(s) {
-	case "DISCARD":
-		u = DISCARD
-
-	case "LABEL":
-		u = LABEL
-
-	case "COUNTER":
-		u = COUNTER
-
-	case "GAUGE":
-		u = GAUGE
-
-	case "MAPPEDMETRIC":
-		u = MAPPEDMETRIC
-
-	case "DURATION":
-		u = DURATION
-	default:
-		err = fmt.Errorf("wrong ColumnUsage given : %s", s)
-	}
-
-	return
-}
-
 
 // Turn the MetricMap column mapping into a prometheus descriptor mapping.
 func makeDescMap(metricMaps map[string]map[string]ColumnMapping) map[string]MetricMapNamespace {
@@ -399,6 +371,34 @@ func makeDescMap(metricMaps map[string]map[string]ColumnMapping) map[string]Metr
 	}
 
 	return metricMap
+}
+
+// convert a string to the corresponding ColumnUsage
+func stringToColumnUsage(s string) (u ColumnUsage, err error) {
+	switch(s) {
+	case "DISCARD":
+		u = DISCARD
+
+	case "LABEL":
+		u = LABEL
+
+	case "COUNTER":
+		u = COUNTER
+
+	case "GAUGE":
+		u = GAUGE
+
+	case "MAPPEDMETRIC":
+		u = MAPPEDMETRIC
+
+	case "DURATION":
+		u = DURATION
+
+	default:
+		err = fmt.Errorf("wrong ColumnUsage given : %s", s)
+	}
+
+	return
 }
 
 // Convert database.sql types to float64s for Prometheus consumption. Null types are mapped to NaN. string and []byte
@@ -680,7 +680,7 @@ func main() {
 	}
 
 	if *queriesPath != "" {
-		err := add_queries(*queriesPath)
+		err := addQueries(*queriesPath)
 		if err != nil {
 			log.Warnln("Unparseable queries file - discarding merge: ", *queriesPath, err)
 		}
