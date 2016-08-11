@@ -241,15 +241,14 @@ func addQueries(queriesPath string) (err error) {
 				queryOverrides[metric] = query
 
 			case "metrics":
+				var metric_map map[string]ColumnMapping
+				metric_map = make(map[string]ColumnMapping)
+				
 				for _, c := range value.([]interface{}) {
 					column := c.(map[interface{}]interface{})
 
 					for n, a := range column {
 						var cmap ColumnMapping
-						var metric_map map[string]ColumnMapping
-
-						metric_map = make(map[string]ColumnMapping)
-
 						name := n.(string)
 
 						for attr_key, attr_val := range a.(map[interface{}]interface{}) {
@@ -266,12 +265,10 @@ func addQueries(queriesPath string) (err error) {
 						}
 
 						cmap.mapping = nil
-
-						metric_map[name] = cmap
-
-						metricMaps[metric] = metric_map
+						metric_map[name] = cmap									
 					}
 				}
+				metricMaps[metric] = metric_map
 			}
 		}
 	}
